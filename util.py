@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 try:
     from spatial_correlation_sampler import spatial_correlation_sample

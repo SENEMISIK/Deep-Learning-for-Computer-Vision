@@ -3,7 +3,6 @@ import torch.nn.functional as F
 
 
 def EPE(input_flow, target_flow, sparse=False, mean=True):
-    print(input_flow.shape, target_flow.shape)
     EPE_map = torch.norm(target_flow-input_flow,2,1)
     batch_size = EPE_map.size(0)
     if sparse:
