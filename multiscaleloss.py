@@ -4,7 +4,7 @@ from util import flow2rgb
 
 def EPE(input_flow, target_flow, sparse=False, mean=True):
     print(input_flow.shape, target_flow.shape)
-    input_flow = flow2rgb(input_flow, max(input_flow))
+    input_flow = flow2rgb(input_flow, 10)
     print(input_flow.shape, target_flow.shape)
     EPE_map = torch.norm(target_flow-input_flow,2,1)
     batch_size = EPE_map.size(0)
