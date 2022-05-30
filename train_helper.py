@@ -7,6 +7,7 @@ from model import FlowNetS
 from multiscaleloss import multiscaleEPE, realEPE
 import time
 import os
+import random
 
 def get_data(pretrain_size, finetune_size, augment):
     
@@ -26,7 +27,7 @@ def get_data(pretrain_size, finetune_size, augment):
     sintel_test = torchvision.datasets.Sintel(root=".", split="train", pass_name="clean", transforms=test_transforms)
 
     train_ind = np.random.choice(len(sintel_train), finetune_size, replace=False)
-    test_ind = np.random.sample(list(set(range(len(sintel_train))) - set(train_ind)), 200)
+    test_ind = random.sample(list(set(range(len(sintel_train))) - set(train_ind)), 520)
     fc_ind = np.random.choice(len(flying_chairs), pretrain_size, replace=False)
 
     sintel_train = torch.utils.data.Subset(sintel_train, train_ind)
