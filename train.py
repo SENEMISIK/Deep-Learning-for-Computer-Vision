@@ -3,15 +3,16 @@ from train_helper import *
 
 parser = argparse.ArgumentParser(description='Train and evaluate optical flow model.')
 parser.add_argument("-m", "--model-type", default="flownet", type=str)
-parser.add_argument("-s", "--size", default=1000, type=int)
+parser.add_argument("-fc", "--fc-size", default=1000, type=int)
+parser.add_argument("-s", "--sintel-size", default=200, type=int)
 parser.add_argument("-p", "--pretrain", default=1, type=int)
 parser.add_argument("-a", "--augment", default=1, type=int)
 
 def main():
     args = parser.parse_args()
-    pretrain_size = args.size
+    pretrain_size = args.fc_size
+    finetune_size = args.sintel_size
     model_type = args.model_type
-    finetune_size = 520
     pretrain = bool(args.pretrain)
     augment = bool(args.augment)
     

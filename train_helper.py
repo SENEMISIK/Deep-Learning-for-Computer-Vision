@@ -25,8 +25,8 @@ def get_data(pretrain_size, finetune_size, augment):
     test_transforms = OpticalFlowPresetEval()
     sintel_test = torchvision.datasets.Sintel(root=".", split="train", pass_name="clean", transforms=test_transforms)
 
-    train_ind = np.random.choice(len(sintel_train), finetune_size, replace=False)[:10]
-    test_ind = np.array(list(set(range(len(sintel_train))) - set(train_ind)))[:10]
+    train_ind = np.random.choice(len(sintel_train), finetune_size, replace=False)
+    test_ind = np.random.sample(list(set(range(len(sintel_train))) - set(train_ind)), 200)
     fc_ind = np.random.choice(len(flying_chairs), pretrain_size, replace=False)
 
     sintel_train = torch.utils.data.Subset(sintel_train, train_ind)
@@ -106,8 +106,8 @@ def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, epoc
     return epoch_loss
 
 def train_flownet(fc_loader, train_loader, device, augment, pretrain=True):
-    pretrain_epochs = 10
-    finetune_epochs = 5
+    pretrain_epochs = 1
+    finetune_epochs = 1
     lr = 1e-4
     weight_decay = 4e-4
     model = FlowNetS()
@@ -130,7 +130,7 @@ def train_flownet(fc_loader, train_loader, device, augment, pretrain=True):
 def train_raft(fc_loader, train_loader, device, augment, pretrain=True):
     model = torchvision.models.optical_flow.raft_small()
     model.to(device)
-    pretrain_epochs = 20
+    pretrain_epochs = 1
     finetune_epochs = 1
 
     lr = 2e-5
