@@ -6,6 +6,7 @@ parser.add_argument("-m", "--model-type", default="flownet", type=str)
 parser.add_argument("-s", "--size", default=1000, type=int)
 parser.add_argument("-p", "--pretrain", default=1, type=int)
 parser.add_argument("-a", "--augment", default=1, type=int)
+parser.add_argument("-c", "--custom", default=0, type=int)
 
 def main():
     args = parser.parse_args()
@@ -14,13 +15,14 @@ def main():
     model_type = args.model_type
     pretrain = bool(args.pretrain)
     augment = bool(args.augment)
+    cusotm = bool(args.custom)
     
     train_loader, test_loader, fc_loader = get_data(pretrain_size, finetune_size, augment)
     
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     
     if model_type == "flownet":
-        model, pretrain_losses, finetune_losses = train_flownet(fc_loader, train_loader, device, augment, pretrain)
+        model, pretrain_losses, finetune_losses = train_flownet(fc_loader, train_loader, device, augment, pretrain, custom)
         epe, f1, px1, px3, px5 = test_flownet(model, test_loader, device)
         print("Test:")
         print("Epe: ", epe)
