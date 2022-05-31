@@ -15,7 +15,7 @@ def main():
     model_type = args.model_type
     pretrain = bool(args.pretrain)
     augment = bool(args.augment)
-    cusotm = bool(args.custom)
+    custom = bool(args.custom)
     
     train_loader, test_loader, fc_loader = get_data(pretrain_size, finetune_size, augment)
     
