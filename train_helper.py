@@ -13,12 +13,12 @@ def get_data(pretrain_size, finetune_size, augment):
     
     np.random.seed(17)
     
-    fc_transforms = OpticalFlowPresetTrain(crop_size=(368, 496), min_scale=0.1, max_scale=1.0, do_flip=True)
+    fc_transforms = OpticalFlowPresetTrain(crop_size=(368, 496), min_scale=0.1, max_scale=1.0, do_flip=False)
     if not augment:
         fc_transforms = OpticalFlowPresetEval()
     flying_chairs = torchvision.datasets.FlyingChairs(root=".", split="train", transforms=fc_transforms)
     
-    s_transforms = OpticalFlowPresetTrain(crop_size=(368, 768), min_scale=-0.2, max_scale=0.6, do_flip=True)
+    s_transforms = OpticalFlowPresetTrain(crop_size=(368, 768), min_scale=-0.2, max_scale=0.6, do_flip=False)
     if not augment:
         s_transforms = OpticalFlowPresetEval()
     sintel_train = torchvision.datasets.Sintel(root=".", split="train", pass_name="clean", transforms=s_transforms)
