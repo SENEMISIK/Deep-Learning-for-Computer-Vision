@@ -111,8 +111,8 @@ def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, epoc
     return epoch_loss
 
 def train_flownet(fc_loader, train_loader, device, augment, pretrain=True):
-    pretrain_epochs = 10
-    finetune_epochs = 5
+    pretrain_epochs = 100
+    finetune_epochs = 20
     lr = 1e-4
     weight_decay = 4e-4
     model = FlowNetS()
@@ -135,8 +135,8 @@ def train_flownet(fc_loader, train_loader, device, augment, pretrain=True):
 def train_raft(fc_loader, train_loader, device, augment, pretrain=True):
     model = torchvision.models.optical_flow.raft_small()
     model.to(device)
-    pretrain_epochs = 1
-    finetune_epochs = 1
+    pretrain_epochs = 100
+    finetune_epochs = 20
 
     lr = 2e-5
     weight_decay = 5e-5
