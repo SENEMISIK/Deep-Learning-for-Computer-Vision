@@ -16,7 +16,7 @@ def get_data(pretrain_size, finetune_size, augment):
     fc_transforms = OpticalFlowPresetTrain(crop_size=(368, 496), min_scale=0.1, max_scale=1.0, do_flip=True)
     if not augment:
         fc_transforms = OpticalFlowPresetEval()
-    flying_chairs = torchvision.datasets.FlyingChairs(root=".", split="train", transforms=fc_transforms)
+    flying_chairs = torchvision.datasets.FlyingChairs(root="../FlyingChairs", split="train", transforms=fc_transforms)
     
     s_transforms = OpticalFlowPresetTrain(crop_size=(368, 768), min_scale=-0.2, max_scale=0.6, do_flip=True)
     if not augment:
@@ -82,7 +82,11 @@ def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, epoc
         else:
             size = (800, 400)
             resize = torchvision.transforms.Resize(size)
-            image1, image2, flow_gt, _ = (x.to(device) for x in data_blob)
+            blob_tuple = list((x.to(device) for x in data_blob))
+            if len(blob_tuple) == 3:
+                image1, image2, flow_gt = blob_tuple
+            else:
+                image1, image2, flow_gt, _ = blob_tuple
             image1 = resize(image1)
             image2 = resize(image2)
             flow_gt = torch.nn.functional.interpolate(flow_gt, size, mode="bilinear") 

@@ -32,10 +32,10 @@ def main():
             "pretrain_losses": pretrain_losses, 
             "finetune_losses": finetune_losses,
             "epe": epe,
-            "f1": f1
-            "1px: ", px1
-            "3px: ", px3
-            "5px: ", px5
+            "f1": f1,
+            "1px:": px1,
+            "3px:": px3,
+            "5px:": px5
         }
         if not pretrain:
             pretrain_size = 0
@@ -55,10 +55,10 @@ def main():
             "pretrain_losses": pretrain_losses,
             "finetune_losses": finetune_losses,
             "epe": epe,
-            "f1": f1
-            "1px: ", px1
-            "3px: ", px3
-            "5px: ", px5
+            "f1": f1,
+            "1px:": px1,
+            "3px:": px3,
+            "5px:": px5
         }
         if not pretrain:
             pretrain_size = 0
