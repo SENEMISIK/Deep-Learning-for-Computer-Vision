@@ -16,7 +16,7 @@ def get_data(pretrain_size, finetune_size, augment):
     fc_transforms = OpticalFlowPresetTrain(crop_size=(368, 496), min_scale=0.1, max_scale=1.0, do_flip=True)
     if not augment:
         fc_transforms = OpticalFlowPresetEval()
-    flying_chairs = torchvision.datasets.FlyingChairs(root="../FlyingChairs", split="train", transforms=fc_transforms)
+    flying_chairs = torchvision.datasets.FlyingChairs(root=".", split="train", transforms=fc_transforms)
     
     s_transforms = OpticalFlowPresetTrain(crop_size=(368, 768), min_scale=-0.2, max_scale=0.6, do_flip=True)
     if not augment:
@@ -71,13 +71,13 @@ def train_flownet_one_epoch(model, train_loader, optimizer, scheduler, device, a
     print("Epoch", epoch + 1, "finished in", round(time.time() - start, 1), "seconds. Loss:", epoch_loss)
     return epoch_loss
 
-def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, epoch, augment, num_train_flow_updates):
+def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, augment, epoch , num_train_flow_updates):
     start = time.time()
     epoch_loss = 0.0
     for i, data_blob in enumerate(train_loader):
         optimizer.zero_grad()
 
-        if augment:
+        if augment == True:
             image1, image2, flow_gt, valid_flow_mask = (x.to(device) for x in data_blob)
         else:
             size = (800, 400)
@@ -107,7 +107,7 @@ def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, epoc
         optimizer.step()
         scheduler.step()
     epoch_loss /= len(train_loader)
-    print("Epoch", epoch, "finished in", round(time.time() - start, 1), "seconds. Loss:", epoch_loss)
+    print("Epoch", epoch + 1, "finished in", round(time.time() - start, 1), "seconds. Loss:", epoch_loss)
     return epoch_loss
 
 def train_flownet(fc_loader, train_loader, device, augment, pretrain=True):
