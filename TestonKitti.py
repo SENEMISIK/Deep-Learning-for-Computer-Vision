@@ -3,6 +3,8 @@ import torchvision
 import os
 from utils import compute_metrics
 import argparse
+from tqdm import tqdm
+from model import FlowNetS
 
 parser = argparse.ArgumentParser(description='Test optical flow model on Kitti')
 parser.add_argument("-t", "--model-type", default="flownet", type=str)
@@ -16,7 +18,7 @@ class TKitti(torchvision.datasets.KittiFlow):
         img1, img2, flow, valid_flow_mask = super().__getitem__(index)
         img1 = torchvision.transforms.ToTensor()(img1)
         img2 = torchvision.transforms.ToTensor()(img2)
-        return img1, img2, flow, valid_flow_mask
+        return img1, img2, flow
 
 def test():
     kitti = TKitti("./Kitti")
@@ -35,7 +37,7 @@ def test():
         model.eval()   
         model.to(device)   
         with torch.no_grad():
-            for i, (img1, img2, target) in tqdm(enumerate(val_loader)):
+            for i, (img1, img2, target) in tqdm(enumerate(test_loader)):
                 image = torch.cat((img1, img2), dim=1).to(device)
                 label = target.to(device)
                 output = model(image)
@@ -57,7 +59,7 @@ def test():
         model.to(device)
         num_test_updates = 32
         with torch.no_grad():                                         
-            for i, (image1, image2, flow_gt) in tqdm(enumerate(val_loader)):
+            for i, (image1, image2, flow_gt) in tqdm(enumerate(test_loader)):
                 image1.to(device)
                 image2.to(device)
                 flow_gt.to(device)
@@ -81,7 +83,7 @@ def test():
     else:
         raise(Exception("Invalid model type"))                                 
     
-                                         total_epe /= num
+    total_epe /= num
     total_f1 /= num
     total_1px /= num
     total_3px /= num
@@ -90,15 +92,13 @@ def test():
 
 if __name__ == "__main__":
     epe, f1, px1, px3, px5 = test()
-    print("Test:")
+    print("Test optical flow model on KITTI:")
     print("Epe: ", epe)
     print("F1: ", f1)
     print("1px: ", px1)
     print("3px: ", px3)
     print("5px: ", px5)
     results = {
-        "pretrain_losses": pretrain_losses, 
-        "finetune_losses": finetune_losses,
         "epe": epe,
         "f1": f1,
         "1px:": px1,
