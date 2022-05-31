@@ -34,9 +34,9 @@ def get_data(pretrain_size, finetune_size, augment):
     sintel_test = torch.utils.data.Subset(sintel_test, test_ind)
     fc_pretrain = torch.utils.data.Subset(flying_chairs, fc_ind)
 
-    train_loader = torch.utils.data.DataLoader(sintel_train, batch_size=10, shuffle=True)
-    test_loader = torch.utils.data.DataLoader(sintel_test, batch_size=10, shuffle=False)
-    fc_loader = torch.utils.data.DataLoader(fc_pretrain, batch_size=10, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(sintel_train, batch_size=5, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(sintel_test, batch_size=5, shuffle=False)
+    fc_loader = torch.utils.data.DataLoader(fc_pretrain, batch_size=5, shuffle=True)
 
     return train_loader, test_loader, fc_loader
 
@@ -82,7 +82,7 @@ def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, epoc
         else:
             size = (800, 400)
             resize = torchvision.transforms.Resize(size)
-            image1, image2, flow_gt = (x.to(device) for x in data_blob)
+            image1, image2, flow_gt, _ = (x.to(device) for x in data_blob)
             image1 = resize(image1)
             image2 = resize(image2)
             flow_gt = torch.nn.functional.interpolate(flow_gt, size, mode="bilinear") 
@@ -103,12 +103,12 @@ def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, epoc
         optimizer.step()
         scheduler.step()
     epoch_loss /= len(train_loader)
-    print("Epoch", epoch + 1, "finished in", round(time.time() - start, 1), "seconds. Loss:", epoch_loss)
+    print("Epoch", epoch, "finished in", round(time.time() - start, 1), "seconds. Loss:", epoch_loss)
     return epoch_loss
 
 def train_flownet(fc_loader, train_loader, device, augment, pretrain=True):
-    pretrain_epochs = 1
-    finetune_epochs = 1
+    pretrain_epochs = 10
+    finetune_epochs = 5
     lr = 1e-4
     weight_decay = 4e-4
     model = FlowNetS()
@@ -169,6 +169,9 @@ def test_flownet(model, test_loader, device):
     model.eval()
     total_epe = 0.0
     total_f1 = 0.0
+    total_1px = 0.0
+    total_3px = 0.0
+    total_5px = 0.0
 
     with torch.no_grad():
         for i, data_blob in enumerate(test_loader):
@@ -181,20 +184,27 @@ def test_flownet(model, test_loader, device):
             metrics, _ = compute_metrics(upsampled_output, flow_gt)
             epe = metrics["epe"]
             f1 = metrics["f1"]
+            total_1px += metrics['1px']
+            total_3px += metrics['3px']
+            total_5px += metrics['5px']
 
             total_epe += epe
             total_f1 += f1
 
     total_epe /= len(test_loader)
     total_f1 /= len(test_loader)
-    
-    return total_epe, total_f1
+    total_1px /= len(test_loader)
+    total_3px /= len(test_loader)
+    total_5px /= len(test_loader)
+    return total_epe, total_f1, total_1px, total_3px, total_5px 
 
 def test_raft(model, test_loader, device, num_test_updates=32):
     model.eval()
     total_epe = 0.0
     total_f1 = 0.0
-    
+    total_1px = 0.0
+    total_3px = 0.0
+    total_5px = 0.0    
 
     with torch.no_grad():
         for i, data_blob in enumerate(test_loader):
@@ -209,14 +219,20 @@ def test_raft(model, test_loader, device, num_test_updates=32):
             metrics, _ = compute_metrics(flow_pred, flow_gt)
             epe = metrics["epe"]
             f1 = metrics["f1"]
+            total_1px += metrics['1px']
+            total_3px += metrics['3px']
+            total_5px += metrics['5px']
 
             total_epe += epe
             total_f1 += f1
 
     total_epe /= len(test_loader)
     total_f1 /= len(test_loader)
+    total_1px /= len(test_loader)
+    total_3px /= len(test_loader)
+    total_5px /= len(test_loader)
     
-    return total_epe, total_f1
+    return total_epe, total_f1, total_1px, total_3px, total_5px 
 
 def save_results(results, model_type, pretrain_size, augment):
     augment = "A" if augment else "NA"

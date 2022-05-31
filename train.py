@@ -21,15 +21,21 @@ def main():
     
     if model_type == "flownet":
         model, pretrain_losses, finetune_losses = train_flownet(fc_loader, train_loader, device, augment, pretrain)
-        epe, f1 = test_flownet(model, test_loader, device)
+        epe, f1, px1, px3, px5 = test_flownet(model, test_loader, device)
         print("Test:")
         print("Epe: ", epe)
         print("F1: ", f1)
+        print("1px: ", px1)
+        print("3px: ", px3)
+        print("5px: ", px5)
         results = {
             "pretrain_losses": pretrain_losses, 
             "finetune_losses": finetune_losses,
             "epe": epe,
             "f1": f1
+            "1px: ", px1
+            "3px: ", px3
+            "5px: ", px5
         }
         if not pretrain:
             pretrain_size = 0
@@ -38,15 +44,21 @@ def main():
     
     elif model_type == "raft":
         model, pretrain_losses, finetune_losses = train_raft(fc_loader, train_loader, device, augment, pretrain)
-        epe, f1 = test_raft(model, test_loader, device)
+        epe, f1, px1, px3, px5 = test_raft(model, test_loader, device)
         print("Test:")
         print("Epe: ", epe)
         print("F1: ", f1)
+        print("1px: ", px1)
+        print("3px: ", px3)
+        print("5px: ", px5)
         results = {
-            "pretrain_losses": pretrain_losses, 
+            "pretrain_losses": pretrain_losses,
             "finetune_losses": finetune_losses,
             "epe": epe,
             "f1": f1
+            "1px: ", px1
+            "3px: ", px3
+            "5px: ", px5
         }
         if not pretrain:
             pretrain_size = 0
