@@ -13,12 +13,12 @@ def get_data(pretrain_size, finetune_size, augment):
     
     np.random.seed(17)
     
-    fc_transforms = OpticalFlowPresetTrain(crop_size=(368, 496), min_scale=0.1, max_scale=1.0, do_flip=True)
+    fc_transforms = OpticalFlowPresetTrain(crop_size=(368, 496), min_scale=0.1, max_scale=1.0, do_flip=False)
     if not augment:
         fc_transforms = OpticalFlowPresetEval()
     flying_chairs = torchvision.datasets.FlyingChairs(root=".", split="train", transforms=fc_transforms)
     
-    s_transforms = OpticalFlowPresetTrain(crop_size=(368, 768), min_scale=-0.2, max_scale=0.6, do_flip=True)
+    s_transforms = OpticalFlowPresetTrain(crop_size=(368, 768), min_scale=-0.2, max_scale=0.6, do_flip=False)
     if not augment:
         s_transforms = OpticalFlowPresetEval()
     sintel_train = torchvision.datasets.Sintel(root=".", split="train", pass_name="clean", transforms=s_transforms)
@@ -110,12 +110,12 @@ def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, augm
     print("Epoch", epoch + 1, "finished in", round(time.time() - start, 1), "seconds. Loss:", epoch_loss)
     return epoch_loss
 
-def train_flownet(fc_loader, train_loader, device, augment, pretrain=True):
+def train_flownet(fc_loader, train_loader, device, augment, pretrain, custom):
     pretrain_epochs = 100
     finetune_epochs = 20
     lr = 1e-4
     weight_decay = 4e-4
-    model = FlowNetS()
+    model = FlowNetS(custom=custom)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     model = model.to(device)
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[50, 75, 100, 110], gamma=0.5)
