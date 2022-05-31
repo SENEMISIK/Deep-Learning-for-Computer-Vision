@@ -105,6 +105,4 @@ if __name__ == "__main__":
         "3px:": px3,
         "5px:": px5
     }
-    path = os.path.join("results", args.model + "_kitti_test.txt")
-    torch.save(results, path)
     
