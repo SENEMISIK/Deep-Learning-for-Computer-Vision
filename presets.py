@@ -35,7 +35,7 @@ class OpticalFlowPresetTrain(torch.nn.Module):
         hue=0.5 / 3.14,
         # Random[H,V]Flip params
         asymmetric_jitter_prob=0.2,
-        do_flip=True,
+        do_flip=False,
     ):
         super().__init__()
 
