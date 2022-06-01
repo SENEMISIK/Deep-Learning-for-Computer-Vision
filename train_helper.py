@@ -110,12 +110,12 @@ def train_raft_one_epoch(model, train_loader, optimizer, scheduler, device, augm
     print("Epoch", epoch + 1, "finished in", round(time.time() - start, 1), "seconds. Loss:", epoch_loss)
     return epoch_loss
 
-def train_flownet(fc_loader, train_loader, device, augment, pretrain=True):
+def train_flownet(fc_loader, train_loader, device, augment, pretrain, custom):
     pretrain_epochs = 100
     finetune_epochs = 20
     lr = 1e-4
     weight_decay = 4e-4
-    model = FlowNetS()
+    model = FlowNetS(custom=custom)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
     model = model.to(device)
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[50, 75, 100, 110], gamma=0.5)

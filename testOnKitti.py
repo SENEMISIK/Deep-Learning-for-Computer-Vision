@@ -5,6 +5,7 @@ from utils import compute_metrics
 import argparse
 from tqdm import tqdm
 from model import FlowNetS
+from utils import InputPadder
 
 parser = argparse.ArgumentParser(description='Test optical flow model on Kitti')
 parser.add_argument("-t", "--model-type", default="flownet", type=str)
@@ -60,16 +61,21 @@ def test():
         num_test_updates = 32
         with torch.no_grad():                                         
             for i, (image1, image2, flow_gt) in tqdm(enumerate(test_loader)):
-                image1.to(device)
-                image2.to(device)
-                flow_gt.to(device)
+#                 image1.to(device)
+#                 image2.to(device)
+#                 flow_gt.to(device)
+                image1 = image1.to(device)
+                image2 = image2.to(device)
+                flow_gt = flow_gt.to(device)
+                
                 
                 padder = InputPadder(image1.shape)
-                image1, image2 = padder.pad(image1, image2)              
-                      
+                image1, image2 = padder.pad(image1, image2)
+                
                 flow_predictions = model(image1, image2, num_flow_updates=num_test_updates)
                 flow_pred = flow_predictions[-1]
                 flow_pred = padder.unpad(flow_pred)
+                # flow_pred = flow_pred.squeeze()
                 
                 metrics, _ = compute_metrics(flow_pred, flow_gt)
                 epe = metrics["epe"]

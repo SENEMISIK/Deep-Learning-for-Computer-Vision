@@ -1,19 +1,24 @@
 import torch
 import torch.nn as nn
 from torch.nn.init import kaiming_normal_, constant_
-from util import conv, predict_flow, deconv, crop_like
+from util import conv, deconv, crop_like
 
-# __all__ = [
-#     'flownets', 'flownets_bn'
-# ]
+def predict_flow(in_planes):
+    return nn.Conv2d(in_planes,2,kernel_size=3,stride=1,padding=1,bias=False)
 
+def predict_flow_custom(in_planes):
+    return nn.ConvTranspose2d(in_planes, 2, kernel_size=7, stride=4, padding=1, bias=False)
 
 class FlowNetS(nn.Module):
     expansion = 1
 
-    def __init__(self,batchNorm=True):
+    def __init__(self,batchNorm=True, custom=True):
         super(FlowNetS,self).__init__()
 
+        if custom:
+            self.predict_flow = predict_flow
+        else:
+            self.predict_flow = predict_flow_custom
         self.batchNorm = batchNorm
         self.conv1   = conv(self.batchNorm,   6,   64, kernel_size=7, stride=2)
         self.conv2   = conv(self.batchNorm,  64,  128, kernel_size=5, stride=2)
@@ -31,11 +36,11 @@ class FlowNetS(nn.Module):
         self.deconv3 = deconv(770,128)
         self.deconv2 = deconv(386,64)
 
-        self.predict_flow6 = predict_flow(1024)
-        self.predict_flow5 = predict_flow(1026)
-        self.predict_flow4 = predict_flow(770)
-        self.predict_flow3 = predict_flow(386)
-        self.predict_flow2 = predict_flow(194)
+        self.predict_flow6 = self.predict_flow(1024)
+        self.predict_flow5 = self.predict_flow(1026)
+        self.predict_flow4 = self.predict_flow(770)
+        self.predict_flow3 = self.predict_flow(386)
+        self.predict_flow2 = self.predict_flow(194)
 
         self.upsampled_flow6_to_5 = nn.ConvTranspose2d(2, 2, 4, 2, 1, bias=False)
         self.upsampled_flow5_to_4 = nn.ConvTranspose2d(2, 2, 4, 2, 1, bias=False)
